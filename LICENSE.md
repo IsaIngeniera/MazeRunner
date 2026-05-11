@@ -1,7 +1,7 @@
 # Aviso de Copyright / Copyright Notice
 
 **Copyright (c) 2026**  
-Isabella Ocampo Sanchez, Maria Laura Tafur Gomez, Juan Manuel Hernandez Martelo
+Isabella Ocampo Sanchez, Maria Laura Tafur Gomez, Juan Manuel Hernandez Martelo.
 
 **Todos los derechos reservados / All Rights Reserved**
 
