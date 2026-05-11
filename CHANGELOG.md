@@ -36,23 +36,15 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 
 
 
-## [1.1.0] - 2026-05-
+## [1.0.7] - 2026-06-
 
 
 
-## [1.1.1] - 2026-05-
+## [1.0.8] - 2026-06-
 
 
 
-## [1.1.2] - 2026-05-
-
-
-
-## [1.1.3] - 2026-05-
-
-
-
-## [1.0.6] - 2026-05-
+## [1.0.9] - 2026-06-
 
 
 
@@ -65,10 +57,6 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 
 
 ## [1.1.2] - 2026-05-
-
-
-
-## [1.1.3] - 2026-05-
 
 
 
