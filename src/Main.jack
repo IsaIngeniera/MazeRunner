@@ -1,0 +1,29 @@
+/**
+ * Clase Main
+ * Punto de entrada principal del programa en el entorno Nand2Tetris.
+ * Su único objetivo por ahora es instanciar la clase Mapa y mostrarla en pantalla.
+ */
+class Main {
+    function void main() {
+        var Mapa mapa;
+
+        // 1. Instanciamos el objeto Mapa
+        // Esto ejecuta el constructor, creando la cuadrícula 2D (16x32)
+        // y asignando paredes y pasillos.
+        let mapa = Mapa.new();
+
+        // 2. Le indicamos al mapa que realice el dibujo en la pantalla
+        // Mapeará los 1 y 0 de su matriz a bloques de 16x16.
+        do mapa.dibujar();
+
+        // 3. Ciclo infinito
+        // Mantiene la ejecución del programa viva para que 
+        // podamos visualizar el mapa generado en la pantalla del emulador.
+        while (true) {
+            // En el futuro, aquí iría la lógica principal del juego (Game Loop),
+            // actualizando al jugador y al enemigo.
+        }
+        do mapa.dispose();
+        return;
+    }
+}

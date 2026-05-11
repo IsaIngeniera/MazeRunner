@@ -1,0 +1,126 @@
+/**
+ * La clase Mapa gestiona el laberinto con dimensiones de 256x128 píxeles.
+ * Esto equivale a una cuadrícula de 8 filas por 16 columnas (bloques de 16x16).
+ * Utiliza el código generado por la herramienta de Nand2Tetris para dibujar la pantalla,
+ * y luego escanea la memoria de video para autogenerar la matriz 2D de colisiones.
+ */
+class Mapa {
+    field Array grid; // Matriz bidimensional (Array de Arrays)
+    field int filas, columnas;
+    
+    constructor Mapa new() {
+        var int i;
+        
+        // Nuevas dimensiones: 256x128 píxeles
+        // 256 / 16 = 16 columnas
+        // 128 / 16 = 8 filas
+        let filas = 8;
+        let columnas = 16;
+        
+        // 1. Reservar memoria para las 8 filas x 16 columnas
+        let grid = Array.new(filas);
+        let i = 0;
+        while (i < filas) {
+            let grid[i] = Array.new(columnas);
+            let i = i + 1;
+        }
+        
+        // 2. Dibujamos el mapa en pantalla usando TU código generado
+        // Limpiamos pantalla antes por precaución
+        do Screen.clearScreen();
+        do dibujar();
+
+        // 3. Autogenerar matriz de colisiones
+        // Escaneamos la parte superior izquierda (256x128)
+        do autoGenerarMatriz();
+        
+        return this;
+    }
+
+    /** 
+     * Método público para redibujar el mapa.
+     */
+    method void dibujar() {
+        // Llama a la función con el código que generaste (empezando en 0,0)
+        do draw(0);
+        return;
+    }
+
+    /**
+     * Escanea la pantalla para detectar paredes y llenar el 'grid'.
+     * Para el "Escape": si una parte de la pared es blanca, se marcará como 0 (camino).
+     * Puedes luego verificar lógicamente si el jugador está en esa posición para ganar.
+     */
+    method void autoGenerarMatriz() {
+        var int i, j;
+        var Array filaActual;
+        var int memAddress;
+        var int valorMemoria;
+
+        let i = 0;
+        while (i < filas) {
+            let filaActual = grid[i];
+            let j = 0;
+            while (j < columnas) {
+                // Revisamos la memoria en el centro de cada bloque de 16x16.
+                // Cada fila en Y salta 512 palabras (16px de alto * 32 palabras de ancho de pantalla).
+                // Revisamos la línea 8 del bloque (la mitad): 8 * 32 = 256.
+                let memAddress = 16384 + (i * 512) + 256 + j;
+                let valorMemoria = Memory.peek(memAddress);
+                
+                // 0 = Blanco (Camino o Escape)
+                // != 0 = Negro (Pared)
+                if (valorMemoria = 0) {
+                    let filaActual[j] = 0;
+                } else {
+                    let filaActual[j] = 1;
+                }
+                
+                let j = j + 1;
+            }
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /**
+     * PEGA AQUÍ TU CÓDIGO GENERADO POR NAND2TETRIS (Ajustado a 256x128).
+     */
+    method void draw(int location) {
+        var int memAddress; 
+        let memAddress = 16384 + location;
+        
+        // --- PEGAR EL CÓDIGO GENERADO POR NAND2TETRIS AQUÍ ---
+        
+        return;
+    }
+
+    /** Consulta si una coordenada es pared */
+    method int esPared(int fila, int col) {
+        var Array filaBuscada;
+        if ((fila > -1) & (fila < filas) & (col > -1) & (col < columnas)) {
+            let filaBuscada = grid[fila];
+            return filaBuscada[col];
+        }
+        return 1; 
+    }
+
+    /** Getters para las dimensiones */
+    method int getFilas() { return filas; }
+    method int getColumnas() { return columnas; }
+
+    /** Liberar memoria */
+    method void dispose() {
+        var int i;
+        var Array filaActual;
+        let i = 0;
+        while (i < filas) {
+            let filaActual = grid[i];
+            do filaActual.dispose();
+            let i = i + 1;
+        }
+        do grid.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}
