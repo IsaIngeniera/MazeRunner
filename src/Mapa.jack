@@ -1,23 +1,27 @@
 /**
- * La clase Mapa gestiona el laberinto con dimensiones de 256x128 píxeles.
+ * La clase Mapa gestiona el laberinto estático con dimensiones de 256x128 píxeles.
  * Esto equivale a una cuadrícula de 8 filas por 16 columnas (bloques de 16x16).
- * Utiliza el código generado por la herramienta de Nand2Tetris para dibujar la pantalla,
- * y luego escanea la memoria de video para autogenerar la matriz 2D de colisiones.
+ * El diseño del laberinto está predefinido, incluyendo una salida (escape).
  */
 class Mapa {
-    field Array grid; // Matriz bidimensional (Array de Arrays)
+    field Array grid; // Matriz bidimensional de 8x16
     field int filas, columnas;
     
+    // Coordenadas de la salida (escape)
+    field int escapeFila, escapeCol;
+    
     constructor Mapa new() {
-        var int i;
+        var int i, j;
+        var Array filaActual;
         
-        // Nuevas dimensiones: 256x128 píxeles
-        // 256 / 16 = 16 columnas
-        // 128 / 16 = 8 filas
         let filas = 8;
         let columnas = 16;
         
-        // 1. Reservar memoria para las 8 filas x 16 columnas
+        // La salida (el "hueco blanco" en la pared) estará en la fila 7, columna 15
+        let escapeFila = 7;
+        let escapeCol = 15;
+        
+        // 1. Reservar memoria
         let grid = Array.new(filas);
         let i = 0;
         while (i < filas) {
@@ -25,57 +29,90 @@ class Mapa {
             let i = i + 1;
         }
         
-        // 2. Dibujamos el mapa en pantalla usando TU código generado
-        // Limpiamos pantalla antes por precaución
-        do Screen.clearScreen();
-        do dibujar();
-
-        // 3. Autogenerar matriz de colisiones
-        // Escaneamos la parte superior izquierda (256x128)
-        do autoGenerarMatriz();
-        
-        return this;
-    }
-
-    /** 
-     * Método público para redibujar el mapa.
-     */
-    method void dibujar() {
-        // Llama a la función con el código que generaste (empezando en 0,0)
-        do draw(0);
-        return;
-    }
-
-    /**
-     * Escanea la pantalla para detectar paredes y llenar el 'grid'.
-     * Para el "Escape": si una parte de la pared es blanca, se marcará como 0 (camino).
-     * Puedes luego verificar lógicamente si el jugador está en esa posición para ganar.
-     */
-    method void autoGenerarMatriz() {
-        var int i, j;
-        var Array filaActual;
-        var int memAddress;
-        var int valorMemoria;
-
+        // 2. Construir el diseño ESTÁTICO del laberinto
+        // Rellenamos todo con 0s primero
         let i = 0;
         while (i < filas) {
             let filaActual = grid[i];
             let j = 0;
             while (j < columnas) {
-                // Revisamos la memoria en el centro de cada bloque de 16x16.
-                // Cada fila en Y salta 512 palabras (16px de alto * 32 palabras de ancho de pantalla).
-                // Revisamos la línea 8 del bloque (la mitad): 8 * 32 = 256.
-                let memAddress = 16384 + (i * 512) + 256 + j;
-                let valorMemoria = Memory.peek(memAddress);
-                
-                // 0 = Blanco (Camino o Escape)
-                // != 0 = Negro (Pared)
-                if (valorMemoria = 0) {
-                    let filaActual[j] = 0;
-                } else {
-                    let filaActual[j] = 1;
+                let filaActual[j] = 0; 
+                let j = j + 1;
+            }
+            let i = i + 1;
+        }
+        
+        // Fila 0: Borde superior completo
+        let filaActual = grid[0];
+        let j = 0; while(j < 16) { let filaActual[j] = 1; let j = j + 1; }
+        
+        // Fila 1: Paredes laterales e interiores
+        let filaActual = grid[1];
+        let filaActual[0] = 1; let filaActual[4] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
+        
+        // Fila 2
+        let filaActual = grid[2];
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[3] = 1; let filaActual[4] = 1; 
+        let filaActual[6] = 1; let filaActual[7] = 1; let filaActual[8] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
+        
+        // Fila 3
+        let filaActual = grid[3];
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[10] = 1; let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
+        
+        // Fila 4
+        let filaActual = grid[4];
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[4] = 1; let filaActual[5] = 1; 
+        let filaActual[6] = 1; let filaActual[8] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
+        
+        // Fila 5
+        let filaActual = grid[5];
+        let filaActual[0] = 1; let filaActual[8] = 1; let filaActual[15] = 1;
+        
+        // Fila 6
+        let filaActual = grid[6];
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[3] = 1; let filaActual[4] = 1; 
+        let filaActual[5] = 1; let filaActual[6] = 1; let filaActual[8] = 1; let filaActual[10] = 1; 
+        let filaActual[11] = 1; let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
+        
+        // Fila 7: Borde inferior, EXCEPTO la salida (escape)
+        let filaActual = grid[7];
+        let j = 0; 
+        while(j < 16) { 
+            if (~(j = escapeCol)) { // Si no es la columna de escape, ponemos pared
+                let filaActual[j] = 1; 
+            }
+            let j = j + 1; 
+        }
+        
+        // Limpiamos pantalla y dibujamos el laberinto inicial
+        do Screen.clearScreen();
+        do dibujar();
+        
+        return this;
+    }
+
+    /** 
+     * Dibuja todo el laberinto iterando la matriz.
+     */
+    method void dibujar() {
+        var int i, j;
+        var Array filaActual;
+        var int memAddress;
+
+        let i = 0;
+        while (i < filas) {
+            let filaActual = grid[i];
+            let j = 0;
+            
+            while (j < columnas) {
+                if (filaActual[j] = 1) {
+                    // Calculamos la dirección base para el bloque de 16x16
+                    // 16384 es el inicio de la pantalla.
+                    // (i * 512) baja las filas enteras de bloques.
+                    // j mueve a la derecha por columnas.
+                    let memAddress = 16384 + (i * 512) + j;
+                    do dibujarBloquePared(memAddress);
                 }
-                
                 let j = j + 1;
             }
             let i = i + 1;
@@ -84,14 +121,26 @@ class Mapa {
     }
 
     /**
-     * PEGA AQUÍ TU CÓDIGO GENERADO POR NAND2TETRIS (Ajustado a 256x128).
+     * Dibuja un cuadrado negro de 16x16 directamente en RAM.
+     * Extremadamente rápido.
      */
-    method void draw(int location) {
-        var int memAddress; 
-        let memAddress = 16384 + location;
-        
-        // --- PEGAR EL CÓDIGO GENERADO POR NAND2TETRIS AQUÍ ---
-        
+    method void dibujarBloquePared(int memAddress) {
+        do Memory.poke(memAddress, -1);
+        do Memory.poke(memAddress + 32, -1);
+        do Memory.poke(memAddress + 64, -1);
+        do Memory.poke(memAddress + 96, -1);
+        do Memory.poke(memAddress + 128, -1);
+        do Memory.poke(memAddress + 160, -1);
+        do Memory.poke(memAddress + 192, -1);
+        do Memory.poke(memAddress + 224, -1);
+        do Memory.poke(memAddress + 256, -1);
+        do Memory.poke(memAddress + 288, -1);
+        do Memory.poke(memAddress + 320, -1);
+        do Memory.poke(memAddress + 352, -1);
+        do Memory.poke(memAddress + 384, -1);
+        do Memory.poke(memAddress + 416, -1);
+        do Memory.poke(memAddress + 448, -1);
+        do Memory.poke(memAddress + 480, -1);
         return;
     }
 
@@ -102,10 +151,20 @@ class Mapa {
             let filaBuscada = grid[fila];
             return filaBuscada[col];
         }
-        return 1; 
+        return 1; // Fuera del mapa se considera pared
     }
 
-    /** Getters para las dimensiones */
+    /** 
+     * Consulta si el jugador llegó a la meta (escape).
+     */
+    method boolean esEscape(int fila, int col) {
+        if ((fila = escapeFila) & (col = escapeCol)) {
+            return true;
+        }
+        return false;
+    }
+
+    /** Getters para dimensiones */
     method int getFilas() { return filas; }
     method int getColumnas() { return columnas; }
 
