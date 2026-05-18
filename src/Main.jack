@@ -6,7 +6,37 @@
 class Main {
     function void main() {
         var Mapa mapa;
+        var int semilla;
 
+        var Jugador jugador;
+        var Enemigo enemigo;
+        var boolean juegoTerminado;
+        var char teclaJuego;
+
+        let jugarDeNuevo = true;
+
+        while (jugarDeNuevo) {
+            // ESTE ES EL MENUU
+           // aqui capturamos la semilla para que se genere el enemigo en diferentes lugares cada vez
+            do Screen.clearScreen();
+            do Output.moveCursor(8, 23);
+            do Output.printString("MAZE RUNNER");
+            do Output.moveCursor(12, 13);
+            do Output.printString("PRESIONA CUALQUIER TECLA PARA EMPEZAR");
+            
+            let semilla = 0;
+            while (Keyboard.keyPressed() = 0) {
+                let semilla = semilla + 1;
+                if (semilla > 32000) { let semilla = 1; }
+            }
+
+            // Esperar a que el jugador suelte la tecla para no arrancar moviéndose solo
+            while (~(Keyboard.keyPressed() = 0)) {}
+
+            // Configurar la semilla en la clase Random
+            do Random.setSemilla(semilla);
+            do Screen.clearScreen();
+        }
         // 1. Instanciamos el objeto Mapa
         // Esto ejecuta el constructor, creando la cuadrícula 2D (16x32)
         // y asignando paredes y pasillos.

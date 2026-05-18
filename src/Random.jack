@@ -1,0 +1,26 @@
+class Random {
+    static int semilla; // El valor se comparte en todo el juego
+
+    /** Configura la semilla inicial (solo se hace una vez al principio del juego) */
+    function void setSemilla(int nuevaSemilla) {
+        let semilla = nuevaSemilla;
+        return;
+    }
+
+    /** Genera un número aleatorio entre 0 y un valor máximo (no incluido) */
+    function int randInt(int max) {
+        var int resultado;
+        
+        // Fórmula matemática clásica para desordenar bits (Linear Congruential Generator)
+        let semilla = (semilla * 7919) + 13751;
+        
+        // Aseguramos que el número no se vuelva negativo por desborde
+        if (semilla < 0) {
+            let semilla = 0 - semilla;
+        }
+        
+        // Operación de residuo (módulo) manual para ajustar el número al rango máximo
+        let resultado = semilla - ((semilla / max) * max);
+        return resultado;
+    }
+}

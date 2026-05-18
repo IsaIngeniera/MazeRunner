@@ -1,1 +1,22 @@
 
+class Jugador {
+    field int posX, posY;
+
+    constructor Jugador new(int x, int y) {
+        let posX = x;
+        let posY = y;
+        return this;
+    }
+
+    // Estos son los métodos para enemigo, para que pueda obtener la posición del jugador y así perseguirlo
+    method int obtenerPosX() { return posX; }
+    method int obtenerPosY() { return posY; }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+
+ 
+}

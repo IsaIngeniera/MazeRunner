@@ -1,1 +1,256 @@
+class Enemigo {
+     //ATRIBUTOS DEL ENEMIGO:
+    field int posEnemigoX;
+    field int posEnemigoY;  // LAS COORDENADAS DEL ENEMIGO
+    field int velocidad;
 
+    field int estado; // EL ENEMIGO TIENE 2 ESTADOS: 1=PERSECUCION LIBRE, 0=EVASION
+    field int ejeBloqueado; // SI EL ENEMIGO CHOCA CON UNA PARED, SE BLOQUEA EN ESE EJE (0=Y, 1=X) HASTA QUE PUEDA EVADIRLA
+    field int direccionEvasion; //VARIABLE QUE DICE CUAL EJE ES LA DIR QUE HAY QUE USAR PARA EVADIR LA PARED (1 O -1)
+    field int sentidoBloqueado; // EL SENTIDO QUE PUEDE SER ARRIBA, ABAJO, IZQ O DERECHA, QUE ES BLOQUEADO POR LA PARED
+
+    field int targetX, targetY; // LA COORDENADA QUE EL ENEMIGO TIENE COMO OBJETIVO A PERSEGUIR
+    field int previaX, previaY; // VARIABLE QUE GUARDA LA POS PREVIA DEL JUGADOR
+
+    constructor Enemigo new(int posX, int posY, int vel) { // CONSTRUCTOR DEL ENEMIGO, RECIBE LA POSICION INICIAL Y LA VELOCIDAD
+        let posEnemigoX = posX;
+        let posEnemigoY = posY;
+        let velocidad = vel;
+        let estado = 1;
+        let ejeBloqueado = 0;
+        let direccionEvasion = 0;
+        let sentidoBloqueado = 0;
+        let previaX = posX;
+        let previaY = posY;
+        return this;
+    }
+
+    //METODOS GETTER PARA OBTNER LA POS DEL ENEMIGO
+
+    method int getPosX(){
+     return posEnemigoX;
+     }
+
+      method int getPosY(){
+     return posEnemigoY;
+     }
+
+
+      // Se crea el target, pos que el enemigo va a perseguir
+    method void actualizarTarget(Jugador jugador) {
+        var int posX, posY; 
+        var int dX, dY; // Diferencia entre la posición actual del jugador y la previa, para determinar su dirección de movimiento
+        // ej: si posprevia es 14 y ahora es 15, la diferencia dice cuanto se movio el jugador y en que dir
+        var int dirX, dirY; // la dir que conseguimos del mov del jugador
+        var int factorPrediccion; // el factor al cual vamos a predecir, en este caso son 2 casilas adelante del mov del jugador
+        
+        // usamos metodos getter del jugador para obetner su pos
+        let factorPrediccion = 2;
+        let posX = jugador.obtenerPosX();
+        let posY = jugador.obtenerPosY();
+        // si el jugador no se ha movido tomamos su posPrevia como su pos actual 
+        if ((previaX = 0) & (previaY = 0)) {
+            let previaX = posX; 
+            let previaY = posY; 
+        }
+       // calculas la diferencia que dije enteriormente
+        let dX = posX - previaX;
+        let dY = posY - previaY; 
+         // con la diferencia aqui vemos como tener el valor de la direccion del jugador en cada eje
+         // izq, derecha, arriba y abajo = -1, 1, -1, 1 respectiva/te
+        if (dX > 0) { let dirX = 1; } else {
+            if (dX < 0) { let dirX = -1; } else { let dirX = 0; }
+        }
+        let targetX = posX + (dirX * factorPrediccion); // conseguimos el target de la pos x
+
+        if (dY > 0) { let dirY = 1; } else {
+            if (dY < 0) { let dirY = -1; } else { let dirY = 0; }
+        }
+        let targetY = posY + (dirY * factorPrediccion); // conseguimos el target de la pos y
+         //super importante: tenemos que tener una verificacion en caso de que el target tenga coordenadas fuera del mapa
+         // para evitar que el enemigo quede confundido y no se mueva
+         // en este caso, tenemos que las filas son de 1 a 6 y las columnas de 1 a 14.
+        if (targetX < 1)  { let targetX = 1; }
+        if (targetX > 14) { let targetX = 14; }
+        if (targetY < 1)  { let targetY = 1; }
+        if (targetY > 6)  { let targetY = 6; }
+
+        let previaX = posX; // aqui actualizamos el valor de la pos previa del jugador para la sig llamada del metodo
+        let previaY = posY;
+        return;
+    }
+
+    method int obtenerSentido(int posicionEnemigo, int posicionTarget) { // metodo que nos ayuda a saber 
+     // en que direecion movernos para ir a donde el jugador
+        if (posicionEnemigo > posicionTarget) { return -1; } // si el enemigo esta en una pos mayor a la del target
+        // entonces el sentido es negativo, porque?? porque eso significa que el enemigo se encuentra arriba o a la derecha del jugador
+        // asi que debe ir abajo o a la izq para encontrarlo
+        if (posicionEnemigo < posicionTarget) { return 1; } // aqui pasa si el enemigo se encuntra abajo o a la izq del jugador
+        // asi que se mueve hacia arriba o a la derecha, por eso el sentido es positivo
+        return 0;
+    }
+
+    // verifica si en la casilla dada del metodo hay una pared, llamamos el metodo de mapa
+    method int verificarPared(int fila, int col, Mapa mapa) {
+        return mapa.esPared(fila, col);
+    }
+
+    // este metodo tamb verifica si hay barrera pero OJO!, lo hace de acuerdo a el siguente paso que va a hacer el enemigo
+    //es para verificar si el next step del enemigo va a ser una pared o no, para asi decidir si se mueve o si tiene que evadir
+    // como hacemos esto???? con el sentido y el eje al cual nos queremos mover
+    // por ejemplo, si eje=1 y sentido = 1, entonces va al eje Y con positivo, osea arriba
+    // entonces seria la pos de ahora por ejemplo (5,6) y con este metodo es 5+sentido que es 5+1 = 6
+    // entonces es pos es la que verficamos si es pared o no. 
+    method int esBloqueado(int eje, int sentido, Mapa mapa) {
+        var int X;
+        var int Y;
+        let X = posEnemigoX;
+        let Y = posEnemigoY;
+        if (eje = 1) { let X = X + sentido; } else { let Y = Y + sentido; }
+        if (mapa.esPared(Y, X) = 1) { return 1; }
+        return 0;
+    }
+        // metodo principal del mov del enemigo, aqui se decide si el estado del enemigo es perseguir al pjugador
+        // o evadir una pared que se encuentre bloqueado
+    method void moverHaciaJugador(Jugador jugador, Mapa mapa) {
+        var int distX, distY;
+        var int sentidoX, sentidoY;
+
+        do actualizarTarget(jugador);
+
+        // ESTADO 1: Persecucion Libre
+        if (estado = 1) {
+            let distX = targetX - posEnemigoX;
+            if (distX < 0) { let distX = 0 - distX; }
+            let distY = targetY - posEnemigoY;
+            if (distY < 0) { let distY = 0 - distY; }
+
+            if (distX > distY) {
+                let sentidoX = obtenerSentido(posEnemigoX, targetX);
+                if (esBloqueado(1, sentidoX, mapa) = 0) {
+                    let posEnemigoX = posEnemigoX + (sentidoX * velocidad);
+                } else {
+                    let estado = 0;
+                    let ejeBloqueado = 1;
+                    let sentidoBloqueado = sentidoX;
+                    let direccionEvasion = obtenerSentido(posEnemigoY, targetY);
+                    if (direccionEvasion = 0) { let direccionEvasion = 1; }
+                }
+            } else {
+                let sentidoY = obtenerSentido(posEnemigoY, targetY);
+                if (esBloqueado(0, sentidoY, mapa) = 0) {
+                    let posEnemigoY = posEnemigoY + (sentidoY * velocidad);
+                } else {
+                    let estado = 0;
+                    let ejeBloqueado = 0;
+                    let sentidoBloqueado = sentidoY;
+                    let direccionEvasion = obtenerSentido(posEnemigoX, targetX);
+                    if (direccionEvasion = 0) { let direccionEvasion = 1; }
+                }
+            }
+        } else {
+
+        // ESTADO 0: Evasion
+        if (estado = 0) {
+
+            if (ejeBloqueado = 1) {
+                // Eje X choco, evadir por Y
+
+                // REGLA DE ORO: hay hueco en X?
+                if (verificarPared(posEnemigoY, posEnemigoX + sentidoBloqueado, mapa) = 0) {
+                    let posEnemigoX = posEnemigoX + sentidoBloqueado;
+                    let estado = 1;
+                } else {
+                    // Muro sigue, moverse por Y para rodearlo
+                    if (verificarPared(posEnemigoY + direccionEvasion, posEnemigoX, mapa) = 0) {
+                        let posEnemigoY = posEnemigoY + (direccionEvasion * velocidad);
+                    } else {
+                        // Esquina: invertir direccion Y y seguir en estado=0.
+                        // CORRECCION DEL BUG: NO se hace let estado=1 aqui.
+                        // Si volvieramos a estado=1, el siguiente frame intentaria
+                        // ir en X de nuevo, chocaria con la misma pared y oscilarıa
+                        // infinitamente entre esta casilla y la pared.
+                        let direccionEvasion = 0 - direccionEvasion;
+                        if (verificarPared(posEnemigoY + direccionEvasion, posEnemigoX, mapa) = 0) {
+                            let posEnemigoY = posEnemigoY + (direccionEvasion * velocidad);
+                        }
+                        // Si no hay salida: esperar un frame (el mapa no puede
+                        // tener casillas completamente encerradas por el diseno del laberinto).
+                    }
+                }
+            } else {
+                // Eje Y choco, evadir por X
+                if (ejeBloqueado = 0) {
+
+                    // REGLA DE ORO: hay hueco en Y?
+                    if (verificarPared(posEnemigoY + sentidoBloqueado, posEnemigoX, mapa) = 0) {
+                        let posEnemigoY = posEnemigoY + sentidoBloqueado;
+                        let estado = 1;
+                    } else {
+                        // Muro sigue, moverse por X para rodearlo
+                        if (verificarPared(posEnemigoY, posEnemigoX + direccionEvasion, mapa) = 0) {
+                            let posEnemigoX = posEnemigoX + (direccionEvasion * velocidad);
+                        } else {
+                            // Esquina: invertir direccion X y seguir en estado=0.
+                            // CORRECCION DEL BUG: misma razon que el caso de ejeBloqueado=1.
+                            let direccionEvasion = 0 - direccionEvasion;
+                            if (verificarPared(posEnemigoY, posEnemigoX + direccionEvasion, mapa) = 0) {
+                                let posEnemigoX = posEnemigoX + (direccionEvasion * velocidad);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        }
+        return;
+    }
+    // dubujamos el enemigo, ahora solo es un bloque, despues le cambiamos la forma 
+    method void dibujar() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(
+            (posEnemigoX * 16) + 2, (posEnemigoY * 16) + 2,
+            (posEnemigoX * 16) + 14, (posEnemigoY * 16) + 14
+        );
+        return;
+    }
+      // metodo para borrar el enemigo, ¿porque?
+      // cada vez que se mueve, el enmigo pinta su nueva pos PERO queda su posicion anteior dibujada
+      // por lo tanto necesitamos un metod que borre su pos previa cada vez que se mueva
+    method void borrar() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(
+            (posEnemigoX * 16) + 2, (posEnemigoY * 16) + 2,
+            (posEnemigoX * 16) + 14, (posEnemigoY * 16) + 14
+        );
+        return;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+   // metodo que ayuda a que el enemigo aparezca en cada jugada en una posicon diferente con ayuda de la clase random
+    method void aparecerRandom(Mapa mapa){
+       var int randX, randY;
+        var boolean encontrado;
+
+        let encontrado = false;
+
+        while (~encontrado) {
+            // Genera una X entre 1 y 14 de forma autónoma
+            let randX = Random.randInt(14) + 1;
+            
+            // Genera una Y entre 1 y 6 de forma autónoma
+            let randY = Random.randInt(6) + 1;
+
+            // Verifica si está libre de paredes
+            if (mapa.esPared(randY, randX) = 0) {
+                let posEnemigoX = randX;
+                let posEnemigoY = randY;
+                let encontrado = true;
+            }
+        }
+        return;
+    }
+}
