@@ -20,10 +20,9 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 - ´Main.jack´: Se agregó la lógica para la prueba de la clase ´Mapa´.
 - ´Mapa.jack´: Implementación de un laberinto básico para la prueba de la lógica del juego.
 
-## [1.0.3] - 2026-05-
-
-
-
+## [1.0.3] - 2026-05-13
+### Modificado
+- `Mapa.jack`: Rediseño completo para utilizar dimensiones estáticas de 256x128 píxeles (cuadrícula de 8x16). Se hardcodeó el laberinto inicial, se incluyó renderizado de alto rendimiento directo en memoria y se definió un punto de "escape".
 ## [1.0.4] - 2026-05-
 
 

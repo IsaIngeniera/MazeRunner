@@ -1,21 +1,29 @@
 /**
  * La clase Mapa gestiona el laberinto estático con dimensiones de 256x128 píxeles.
  * Esto equivale a una cuadrícula de 8 filas por 16 columnas (bloques de 16x16).
+ * El diseño del laberinto está predefinido, incluyendo una salida (escape).
  */
 class Mapa {
-    field Array grid;
+    field Array grid; // Matriz bidimensional de 8x16
     field int filas, columnas;
+    
+    // Coordenadas de la salida (escape)
     field int escapeFila, escapeCol;
-
+    
     constructor Mapa new() {
-        var int i;
+        var int i, j;
+        var Array filaActual;
         
         let filas = 8;
         let columnas = 16;
         let escapeFila = 7;
         let escapeCol = 15;
         
-        // 1. Reservar memoria para la matriz
+        // La salida (el "hueco blanco" en la pared) estará en la fila 7, columna 15
+        let escapeFila = 7;
+        let escapeCol = 15;
+        
+        // 1. Reservar memoria
         let grid = Array.new(filas);
         let i = 0;
         while (i < filas) {
@@ -23,17 +31,71 @@ class Mapa {
             let i = i + 1;
         }
         
-        // 2. Construir la matriz manualmente con las coordenadas perfectas
-        do construirMatrizManual();
+        // 2. Construir el diseño ESTÁTICO del laberinto
+        // Rellenamos todo con 0s primero
+        let i = 0;
+        while (i < filas) {
+            let filaActual = grid[i];
+            let j = 0;
+            
+            while (j < columnas) {
+                let filaActual[j] = 0; 
+                let j = j + 1;
+            }
+            let i = i + 1;
+        }
         
-        // 3. Limpiamos pantalla y dibujamos el laberinto inicial basado en la matriz
+        // Fila 0: Borde superior completo
+        let filaActual = grid[0];
+        let j = 0; while(j < 16) { let filaActual[j] = 1; let j = j + 1; }
+        
+        // Fila 1: Paredes laterales e interiores
+        let filaActual = grid[1];
+        let filaActual[0] = 1; let filaActual[4] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
+        
+        // Fila 2
+        let filaActual = grid[2];
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[3] = 1; let filaActual[4] = 1; 
+        let filaActual[6] = 1; let filaActual[7] = 1; let filaActual[8] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
+        
+        // Fila 3
+        let filaActual = grid[3];
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[10] = 1; let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
+        
+        // Fila 4
+        let filaActual = grid[4];
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[4] = 1; let filaActual[5] = 1; 
+        let filaActual[6] = 1; let filaActual[8] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
+        
+        // Fila 5
+        let filaActual = grid[5];
+        let filaActual[0] = 1; let filaActual[8] = 1; let filaActual[15] = 1;
+        
+        // Fila 6
+        let filaActual = grid[6];
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[3] = 1; let filaActual[4] = 1; 
+        let filaActual[5] = 1; let filaActual[6] = 1; let filaActual[8] = 1; let filaActual[10] = 1; 
+        let filaActual[11] = 1; let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
+        
+        // Fila 7: Borde inferior, EXCEPTO la salida (escape)
+        let filaActual = grid[7];
+        let j = 0; 
+        while(j < 16) { 
+            if (~(j = escapeCol)) { // Si no es la columna de escape, ponemos pared
+                let filaActual[j] = 1; 
+            }
+            let j = j + 1; 
+        }
+        
+        // Limpiamos pantalla y dibujamos el laberinto inicial
         do Screen.clearScreen();
         do dibujar();
         
         return this;
     }
 
-    /** * Dibuja todo el laberinto iterando la matriz.
+    /** 
+     * Dibuja todo el laberinto iterando la matriz.
      */
     method void dibujar() {
         var int i, j;
@@ -48,9 +110,11 @@ class Mapa {
             while (j < columnas) {
                 if (filaActual[j] = 1) {
                     // Calculamos la dirección base para el bloque de 16x16
+                    // 16384 es el inicio de la pantalla.
+                    // (i * 512) baja las filas enteras de bloques.
+                    // j mueve a la derecha por columnas.
                     let memAddress = 16384 + (i * 512) + j;
-                    // Dibujamos el bloque real en la pantalla
-                    do dibujarBloquePared(memAddress); 
+                    do dibujarBloquePared(memAddress);
                 }
                 let j = j + 1;
             }
@@ -61,6 +125,7 @@ class Mapa {
 
     /**
      * Dibuja un cuadrado negro de 16x16 directamente en RAM.
+     * Extremadamente rápido.
      */
     method void dibujarBloquePared(int memAddress) {
         do Memory.poke(memAddress, -1);
@@ -89,10 +154,12 @@ class Mapa {
             let filaBuscada = grid[fila];
             return filaBuscada[col];
         }
-        return 1;
+        return 1; // Fuera del mapa se considera pared
     }
 
-    /** Consulta si el jugador llegó a la meta (escape). */
+    /** 
+     * Consulta si el jugador llegó a la meta (escape).
+     */
     method boolean esEscape(int fila, int col) {
         if ((fila = escapeFila) & (col = escapeCol)) {
             return true;
@@ -100,6 +167,7 @@ class Mapa {
         return false;
     }
 
+    /** Getters para dimensiones */
     method int getFilas() { return filas; }
     method int getColumnas() { return columnas; }
 
