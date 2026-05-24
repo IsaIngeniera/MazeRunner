@@ -23,12 +23,11 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 ## [1.0.3] - 2026-05-13
 ### Modificado
 - `Mapa.jack`: Rediseño completo para utilizar dimensiones estáticas de 256x128 píxeles (cuadrícula de 8x16). Se hardcodeó el laberinto inicial, se incluyó renderizado de alto rendimiento directo en memoria y se definió un punto de "escape".
+- - `Main.jack` : Agregar la parte de creacion de la semilla, la cual nos ayuda a las dos clases anteriores para lo aleatorio.
   
 ## [1.0.4] - 2026-05-17
 - `Enemigo.jack`: Creacion de las clase, con sus metodos para la logica del enemigo 
 - `Random.jack` : Creacion de la clase que nos ayuda a que la posicion del enemigo en cada jugada sea diferente
-- `Main.jack` : Agregar la parte de creacion de la semilla, la cual nos ayuda a las dos clases anteriores para lo aleatorio.
-
 
 
 
