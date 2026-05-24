@@ -45,43 +45,45 @@ class Mapa {
             let i = i + 1;
         }
         
-        // Fila 0: Borde superior completo
+       // Fila 0: Borde superior completo
         let filaActual = grid[0];
         let j = 0; while(j < 16) { let filaActual[j] = 1; let j = j + 1; }
         
-        // Fila 1: Paredes laterales e interiores
+        // Fila 1: Pasillos superiores
         let filaActual = grid[1];
         let filaActual[0] = 1; let filaActual[4] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
-        
-        // Fila 2
+
+        // Fila 2: Muros verticales
         let filaActual = grid[2];
-        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[3] = 1; let filaActual[4] = 1; 
-        let filaActual[6] = 1; let filaActual[7] = 1; let filaActual[8] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
-        
-        // Fila 3
+        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[4] = 1; 
+        let filaActual[6] = 1; let filaActual[7] = 1; let filaActual[8] = 1; 
+        let filaActual[10] = 1; let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
+
+        // Fila 3: Conexiones horizontales
         let filaActual = grid[3];
-        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[10] = 1; let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
-        
-        // Fila 4
+        let filaActual[0] = 1; let filaActual[2] = 1; 
+        let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
+
+        // Fila 4: Obstáculos centrales
         let filaActual = grid[4];
-        let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[4] = 1; let filaActual[5] = 1; 
-        let filaActual[6] = 1; let filaActual[8] = 1; let filaActual[10] = 1; let filaActual[15] = 1;
-        
-        // Fila 5
-        let filaActual = grid[5];
-        let filaActual[0] = 1; let filaActual[8] = 1; let filaActual[15] = 1;
-        
-        // Fila 6
-        let filaActual = grid[6];
         let filaActual[0] = 1; let filaActual[2] = 1; let filaActual[3] = 1; let filaActual[4] = 1; 
-        let filaActual[5] = 1; let filaActual[6] = 1; let filaActual[8] = 1; let filaActual[10] = 1; 
-        let filaActual[11] = 1; let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
+        let filaActual[6] = 1; let filaActual[7] = 1; let filaActual[8] = 1; let filaActual[9] = 1; 
+        let filaActual[10] = 1; let filaActual[12] = 1; let filaActual[13] = 1; let filaActual[15] = 1;
+
+        // Fila 5: Pasillos inferiores
+        let filaActual = grid[5];
+        let filaActual[0] = 1; let filaActual[4] = 1; let filaActual[6] = 0; 
+        let filaActual[10] = 1; let filaActual[15] = 1;
+
+        // Fila 6: Corredor libre en la parte de abajo para asegurar movilidad
+        let filaActual = grid[6];
+        let filaActual[0] = 1; let filaActual[6] = 1; let filaActual[12] = 1;
         
-        // Fila 7: Borde inferior, EXCEPTO la salida (escape)
+        // Fila 7: Borde inferior, dejando libre el hueco de la victoria
         let filaActual = grid[7];
         let j = 0; 
         while(j < 16) { 
-            if (~(j = escapeCol)) { // Si no es la columna de escape, ponemos pared
+            if (~(j = escapeCol)) { 
                 let filaActual[j] = 1; 
             }
             let j = j + 1; 
@@ -100,7 +102,6 @@ class Mapa {
     method void dibujar() {
         var int i, j;
         var Array filaActual;
-        var int memAddress;
 
         let i = 0;
         while (i < filas) {
@@ -109,19 +110,22 @@ class Mapa {
             
             while (j < columnas) {
                 if (filaActual[j] = 1) {
-                    // Calculamos la dirección base para el bloque de 16x16
-                    // 16384 es el inicio de la pantalla.
-                    // (i * 512) baja las filas enteras de bloques.
-                    // j mueve a la derecha por columnas.
-                    let memAddress = 16384 + (i * 512) + j;
-                    do dibujarBloquePared(memAddress);
+                    do Screen.setColor(true);
+                    // Multiplicamos por 32 para que el bloque sea el doble de grande
+                    do Screen.drawRectangle(j * 32, i * 32, (j * 32) + 31, (i * 32) + 31);
                 }
                 let j = j + 1;
             }
             let i = i + 1;
         }
+        
+        // --- CUADRADO DE LA META ---
+        // Dibujamos un bloque negro centrado en la casilla de salida (15, 7)
+        do Screen.setColor(true);
+        do Screen.drawRectangle((15 * 32) + 10, (7 * 32) + 10, (15 * 32) + 21, (7 * 32) + 21);
         return;
     }
+    
 
     /**
      * Dibuja un cuadrado negro de 16x16 directamente en RAM.

@@ -1,22 +1,105 @@
-
 class Jugador {
     field int posX, posY;
+    field int forma;
+    field int tamano;
 
-    constructor Jugador new(int x, int y) {
+    constructor Jugador new(int x, int y, int f, int t) {
         let posX = x;
         let posY = y;
+        let forma = f;
+        let tamano = t;
         return this;
     }
 
-    // Estos son los métodos para enemigo, para que pueda obtener la posición del jugador y así perseguirlo
     method int obtenerPosX() { return posX; }
     method int obtenerPosY() { return posY; }
+
+    method void mover(int direccion, Mapa mapa) {
+        var int nx, ny;
+        let nx = posX;
+        let ny = posY;
+
+        if (direccion = 1) { let ny = posY - 1; }
+        if (direccion = 2) { let ny = posY + 1; }
+        if (direccion = 3) { let nx = posX - 1; }
+        if (direccion = 4) { let nx = posX + 1; }
+
+        if (mapa.esPared(ny, nx) = 0) {
+            let posX = nx;
+            let posY = ny;
+        }
+        return;
+    }
+
+    method void dibujar() {
+        var int baseX, baseY;
+        let baseX = posX * 32;
+        let baseY = posY * 32;
+
+        // Forma 0: Cuadrado con borde blanco (para distinguir del enemigo)
+        if (forma = 0) {
+            if (tamano = 1) {
+                // Cuadrado normal con borde blanco
+                do Screen.setColor(true);
+                do Screen.drawRectangle(baseX + 4, baseY + 4, baseX + 28, baseY + 28);
+                // Borde blanco interior para distinguir
+                do Screen.setColor(false);
+                do Screen.drawRectangle(baseX + 8, baseY + 8, baseX + 24, baseY + 24);
+                do Screen.setColor(true);
+                do Screen.drawRectangle(baseX + 12, baseY + 12, baseX + 20, baseY + 20);
+            } else {
+                // Cuadrado pequeno con borde blanco
+                do Screen.setColor(true);
+                do Screen.drawRectangle(baseX + 8, baseY + 8, baseX + 24, baseY + 24);
+                do Screen.setColor(false);
+                do Screen.drawRectangle(baseX + 11, baseY + 11, baseX + 21, baseY + 21);
+                do Screen.setColor(true);
+                do Screen.drawRectangle(baseX + 14, baseY + 14, baseX + 18, baseY + 18);
+            }
+        }
+
+        do Screen.setColor(true);
+
+        // Forma 1: Flecha
+        if (forma = 1) {
+            do Screen.drawLine(baseX + 16, baseY + 4, baseX + 6, baseY + 18);
+            do Screen.drawLine(baseX + 16, baseY + 4, baseX + 26, baseY + 18);
+            do Screen.drawLine(baseX + 6, baseY + 18, baseX + 26, baseY + 18);
+            do Screen.drawRectangle(baseX + 11, baseY + 18, baseX + 21, baseY + 28);
+        }
+
+        // Forma 2: Corazon
+        if (forma = 2) {
+            do Screen.drawCircle(baseX + 11, baseY + 12, 6);
+            do Screen.drawCircle(baseX + 21, baseY + 12, 6);
+            do Screen.drawLine(baseX + 5, baseY + 14, baseX + 16, baseY + 28);
+            do Screen.drawLine(baseX + 27, baseY + 14, baseX + 16, baseY + 28);
+            do Screen.drawRectangle(baseX + 10, baseY + 12, baseX + 22, baseY + 20);
+        }
+
+        // Forma 3: Muneco de palos
+        if (forma = 3) {
+            do Screen.drawCircle(baseX + 16, baseY + 8, 5);
+            do Screen.drawLine(baseX + 16, baseY + 13, baseX + 16, baseY + 22);
+            do Screen.drawLine(baseX + 8, baseY + 16, baseX + 24, baseY + 16);
+            do Screen.drawLine(baseX + 16, baseY + 22, baseX + 10, baseY + 29);
+            do Screen.drawLine(baseX + 16, baseY + 22, baseX + 22, baseY + 29);
+        }
+
+        return;
+    }
+
+    method void borrar() {
+        var int baseX, baseY;
+        let baseX = posX * 32;
+        let baseY = posY * 32;
+        do Screen.setColor(false);
+        do Screen.drawRectangle(baseX + 2, baseY + 2, baseX + 30, baseY + 30);
+        return;
+    }    
 
     method void dispose() {
         do Memory.deAlloc(this);
         return;
     }
-
-
- 
 }

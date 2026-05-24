@@ -29,10 +29,16 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 - `Enemigo.jack`: Creacion de las clase, con sus metodos para la logica del enemigo 
 - `Random.jack` : Creacion de la clase que nos ayuda a que la posicion del enemigo en cada jugada sea diferente
 
+## [1.0.5] - 2026-05-24
+### Agregado
+- Interfaz de inicio y menú de selección con opciones de modo, forma del jugador y forma del enemigo en `Main.jack`.
+- Lógica de bucle del juego, controles de jugador, detección de victoria/derrota y pantalla de fin/reintento en `Main.jack`.
+- `Documentacion_Maze_Runner.docx`. Allí se comenzó a detallar la funcionalidad de cada una de las clases, los campos y las variables que compone a cada una
 
-
-## [1.0.5] - 2026-05-
-
+### Modificado
+- `Jugador.jack`: se mejoró la forma y tamaño, movimiento con colisiones, dibujo dinámico y borrado de su posición anterior.
+- `Enemigo.jack`: Cambio de la lógica de movimiento, nuevo método de paso seguro, dibujo con varias formas y tamaño, y aparición aleatoria válida sobre el mapa.
+- `Mapa.jack`: ajustes en el diseño del laberinto y en la definición de muros internos.
 
 
 ## [1.0.6] - 2026-05-
