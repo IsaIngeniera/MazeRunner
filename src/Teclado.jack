@@ -1,0 +1,57 @@
+/**
+ * Clase Teclado
+ * Abstrae y facilita las lecturas e interacciones del teclado.
+ */
+class Teclado {
+    
+    function int leerDireccion(char teclaJuego) {
+        if ((teclaJuego = 131) | (teclaJuego = 87) | (teclaJuego = 119)) { return 1; } 
+        if ((teclaJuego = 133) | (teclaJuego = 83) | (teclaJuego = 115)) { return 2; } 
+        if ((teclaJuego = 130) | (teclaJuego = 65) | (teclaJuego = 97))  { return 3; } 
+        if ((teclaJuego = 132) | (teclaJuego = 68) | (teclaJuego = 100)) { return 4; } 
+        return 0;
+    }
+
+    function int leerOpcion(char teclaJuego) {
+        if (teclaJuego = 49) { return 1; }
+        if (teclaJuego = 50) { return 2; }
+        if (teclaJuego = 51) { return 3; }
+        if (teclaJuego = 52) { return 4; }
+        if (teclaJuego = 53) { return 5; }
+        return 0;
+    }
+
+    function int leerOpcionForma(char teclaJuego) {
+        if (teclaJuego = 49) { return 1; }
+        if (teclaJuego = 50) { return 2; }
+        if (teclaJuego = 51) { return 3; }
+        return 0;
+    }
+
+    function void esperarTecla() {
+        while (~(Keyboard.keyPressed() = 0)) {}
+        return;
+    }
+
+    function void esperarEnter() {
+        while (~(Keyboard.keyPressed() = 128)) {}
+        while (~(Keyboard.keyPressed() = 0)) {}
+        return;
+    }
+
+    function int obtenerSemillaConEnter() {
+        var int semilla;
+        let semilla = 0;
+        
+        // Espera a que se presione ENTER, incrementando la semilla
+        while (~(Keyboard.keyPressed() = 128)) {
+            let semilla = semilla + 1;
+            if (semilla > 32000) { let semilla = 1; }
+        }
+        
+        // Espera a que se suelte la tecla
+        while (~(Keyboard.keyPressed() = 0)) {}
+        
+        return semilla;
+    }
+}

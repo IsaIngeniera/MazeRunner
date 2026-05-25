@@ -1,0 +1,478 @@
+function Jugador.new 0
+    push constant 4
+    call Memory.alloc 1
+    pop pointer 0
+    push argument 0
+    pop this 0
+    push argument 1
+    pop this 1
+    push argument 2
+    pop this 2
+    push argument 3
+    pop this 3
+    push pointer 0
+    return
+function Jugador.obtenerPosX 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    return
+function Jugador.obtenerPosY 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    return
+function Jugador.mover 2
+    push argument 0
+    pop pointer 0
+    push this 0
+    pop local 0
+    push this 1
+    pop local 1
+    push argument 1
+    push constant 1
+    eq
+    not
+    if-goto Jugador_1
+    push this 1
+    push constant 1
+    sub
+    pop local 1
+    goto Jugador_0
+label Jugador_1
+label Jugador_0
+    push argument 1
+    push constant 2
+    eq
+    not
+    if-goto Jugador_3
+    push this 1
+    push constant 1
+    add
+    pop local 1
+    goto Jugador_2
+label Jugador_3
+label Jugador_2
+    push argument 1
+    push constant 3
+    eq
+    not
+    if-goto Jugador_5
+    push this 0
+    push constant 1
+    sub
+    pop local 0
+    goto Jugador_4
+label Jugador_5
+label Jugador_4
+    push argument 1
+    push constant 4
+    eq
+    not
+    if-goto Jugador_7
+    push this 0
+    push constant 1
+    add
+    pop local 0
+    goto Jugador_6
+label Jugador_7
+label Jugador_6
+    push argument 2
+    push local 1
+    push local 0
+    call Mapa.esPared 3
+    push constant 0
+    eq
+    not
+    if-goto Jugador_9
+    push local 0
+    pop this 0
+    push local 1
+    pop this 1
+    goto Jugador_8
+label Jugador_9
+label Jugador_8
+    push constant 0
+    return
+function Jugador.dibujar 2
+    push argument 0
+    pop pointer 0
+    push this 0
+    push constant 32
+    call Math.multiply 2
+    pop local 0
+    push this 1
+    push constant 32
+    call Math.multiply 2
+    pop local 1
+    push this 2
+    push constant 0
+    eq
+    not
+    if-goto Jugador_11
+    push this 3
+    push constant 1
+    eq
+    not
+    if-goto Jugador_13
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push local 0
+    push constant 4
+    add
+    push local 1
+    push constant 4
+    add
+    push local 0
+    push constant 28
+    add
+    push local 1
+    push constant 28
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push local 0
+    push constant 8
+    add
+    push local 1
+    push constant 8
+    add
+    push local 0
+    push constant 24
+    add
+    push local 1
+    push constant 24
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push local 0
+    push constant 12
+    add
+    push local 1
+    push constant 12
+    add
+    push local 0
+    push constant 20
+    add
+    push local 1
+    push constant 20
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    goto Jugador_12
+label Jugador_13
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push local 0
+    push constant 8
+    add
+    push local 1
+    push constant 8
+    add
+    push local 0
+    push constant 24
+    add
+    push local 1
+    push constant 24
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push local 0
+    push constant 11
+    add
+    push local 1
+    push constant 11
+    add
+    push local 0
+    push constant 21
+    add
+    push local 1
+    push constant 21
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push local 0
+    push constant 14
+    add
+    push local 1
+    push constant 14
+    add
+    push local 0
+    push constant 18
+    add
+    push local 1
+    push constant 18
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+label Jugador_12
+    goto Jugador_10
+label Jugador_11
+label Jugador_10
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 2
+    push constant 1
+    eq
+    not
+    if-goto Jugador_15
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 4
+    add
+    push local 0
+    push constant 6
+    add
+    push local 1
+    push constant 18
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 4
+    add
+    push local 0
+    push constant 26
+    add
+    push local 1
+    push constant 18
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push constant 6
+    add
+    push local 1
+    push constant 18
+    add
+    push local 0
+    push constant 26
+    add
+    push local 1
+    push constant 18
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push constant 11
+    add
+    push local 1
+    push constant 18
+    add
+    push local 0
+    push constant 21
+    add
+    push local 1
+    push constant 28
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    goto Jugador_14
+label Jugador_15
+label Jugador_14
+    push this 2
+    push constant 2
+    eq
+    not
+    if-goto Jugador_17
+    push local 0
+    push constant 11
+    add
+    push local 1
+    push constant 12
+    add
+    push constant 6
+    call Screen.drawCircle 3
+    pop temp 0
+    push local 0
+    push constant 21
+    add
+    push local 1
+    push constant 12
+    add
+    push constant 6
+    call Screen.drawCircle 3
+    pop temp 0
+    push local 0
+    push constant 5
+    add
+    push local 1
+    push constant 14
+    add
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 28
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push constant 27
+    add
+    push local 1
+    push constant 14
+    add
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 28
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push constant 10
+    add
+    push local 1
+    push constant 12
+    add
+    push local 0
+    push constant 22
+    add
+    push local 1
+    push constant 20
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    goto Jugador_16
+label Jugador_17
+label Jugador_16
+    push this 2
+    push constant 3
+    eq
+    not
+    if-goto Jugador_19
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 8
+    add
+    push constant 5
+    call Screen.drawCircle 3
+    pop temp 0
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 13
+    add
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 22
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push constant 8
+    add
+    push local 1
+    push constant 16
+    add
+    push local 0
+    push constant 24
+    add
+    push local 1
+    push constant 16
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 22
+    add
+    push local 0
+    push constant 10
+    add
+    push local 1
+    push constant 29
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push constant 16
+    add
+    push local 1
+    push constant 22
+    add
+    push local 0
+    push constant 22
+    add
+    push local 1
+    push constant 29
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    goto Jugador_18
+label Jugador_19
+label Jugador_18
+    push constant 0
+    return
+function Jugador.borrar 2
+    push argument 0
+    pop pointer 0
+    push this 0
+    push constant 32
+    call Math.multiply 2
+    pop local 0
+    push this 1
+    push constant 32
+    call Math.multiply 2
+    pop local 1
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push local 0
+    push constant 2
+    add
+    push local 1
+    push constant 2
+    add
+    push local 0
+    push constant 30
+    add
+    push local 1
+    push constant 30
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    return
+function Jugador.dispose 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return

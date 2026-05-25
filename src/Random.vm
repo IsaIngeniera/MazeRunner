@@ -1,0 +1,34 @@
+function Random.setSemilla 0
+    push argument 0
+    pop static 0
+    push constant 0
+    return
+function Random.randInt 1
+    push static 0
+    push constant 7919
+    call Math.multiply 2
+    push constant 13751
+    add
+    pop static 0
+    push static 0
+    push constant 0
+    lt
+    not
+    if-goto Random_1
+    push constant 0
+    push static 0
+    sub
+    pop static 0
+    goto Random_0
+label Random_1
+label Random_0
+    push static 0
+    push static 0
+    push argument 0
+    call Math.divide 2
+    push argument 0
+    call Math.multiply 2
+    sub
+    pop local 0
+    push local 0
+    return

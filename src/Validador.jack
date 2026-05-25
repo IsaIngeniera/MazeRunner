@@ -1,0 +1,25 @@
+/**
+ * Clase Validador
+ * Centraliza validaciones de estados del juego (victoria, colisiones, limites).
+ */
+class Validador {
+    
+    function boolean limitePartidas(int partidas) {
+        return (partidas > 2);
+    }
+
+    function boolean verificarColision(Jugador jugador, Enemigo enemigo) {
+        if ((enemigo.getPosX() = jugador.obtenerPosX()) & (enemigo.getPosY() = jugador.obtenerPosY())) {
+            return true;
+        }
+        return false;
+    }
+
+    function boolean verificarVictoria(Jugador jugador) {
+        // La meta esta en la posicion x=15, y=7
+        if ((jugador.obtenerPosX() = 15) & (jugador.obtenerPosY() = 7)) {
+            return true;
+        }
+        return false;
+    }
+}

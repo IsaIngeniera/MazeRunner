@@ -29,7 +29,7 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 - `Enemigo.jack`: Creacion de las clase, con sus metodos para la logica del enemigo 
 - `Random.jack` : Creacion de la clase que nos ayuda a que la posicion del enemigo en cada jugada sea diferente
 
-## [1.0.5] - 2026-05-24
+## [1.0.5] - 2026-05-20
 ### Agregado
 - Interfaz de inicio y menú de selección con opciones de modo, forma del jugador y forma del enemigo en `Main.jack`.
 - Lógica de bucle del juego, controles de jugador, detección de victoria/derrota y pantalla de fin/reintento en `Main.jack`.
@@ -41,9 +41,18 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 - `Mapa.jack`: ajustes en el diseño del laberinto y en la definición de muros internos.
 
 
-## [1.0.6] - 2026-05-
+## [1.0.6] - 2026-05-24
+### Agregado
+- `Teclado.jack`: Nueva clase utilitaria que abstrae la lectura de inputs del usuario (direcciones, opciones, confirmaciones) y la generación de la semilla aleatoria según el tiempo de respuesta.
+- `Validador.jack`: Nueva clase encargada de verificar la lógica de estado del juego (límites de partidas por memoria, colisiones y detección de victoria).
+- `Juego.jack`: Nueva clase que actúa como *Game Manager*, orquestando el *game loop* y manejando el renderizado de la interfaz de inicio, fin y recarga.
 
-
+### Modificado
+- `Main.jack`: Refactorizado de principio a fin. Se extrajo toda la lógica a clases especializadas, dejando el `Main` como un punto de entrada limpio que solo inicializa y arranca `Juego`.
+- `Enemigo.jack`: Mejora sustancial en la Inteligencia Artificial:
+  - IA Predictiva: El enemigo intenta calcular el futuro movimiento del jugador para tender emboscadas si está lejos, y persecución directa si está cerca.
+  - Algoritmo de Rutas (Greedy BFS): Reescritura del algoritmo de persecución usando Distancia Manhattan, resolviendo los errores donde el enemigo quedaba atascado en pasillos y paredes con forma de U.
+- `Juego.jack`: Se ajustó el *tick rate* haciéndolo significativamente más desafiante y rápido en todos los modos.
 
 ## [1.0.7] - 2026-06-
 
@@ -70,5 +79,3 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 
 
 ## [1.1.3] - 2026-05-
-
-

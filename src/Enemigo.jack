@@ -37,10 +37,25 @@ class Enemigo {
         var int dX, dY;
         var int dirX, dirY;
         var int factorPrediccion;
+        var int distAEnemigoX, distAEnemigoY, distTotal;
         
-        let factorPrediccion = 0;
         let posX = jugador.obtenerPosX();
         let posY = jugador.obtenerPosY();
+        
+        // Calcular distancia al jugador
+        let distAEnemigoX = posX - posEnemigoX;
+        if (distAEnemigoX < 0) { let distAEnemigoX = 0 - distAEnemigoX; }
+        let distAEnemigoY = posY - posEnemigoY;
+        if (distAEnemigoY < 0) { let distAEnemigoY = 0 - distAEnemigoY; }
+        let distTotal = distAEnemigoX + distAEnemigoY;
+
+        // IA AUDAZ: Si el jugador esta lejos, intenta predecir su movimiento e interceptarlo (emboscada).
+        // Si esta cerca, lo persigue directamente para asegurar la captura (como Blinky de Pacman).
+        if (distTotal > 4) {
+            let factorPrediccion = 2; // Predecir 2 casillas adelante
+        } else {
+            let factorPrediccion = 0; // Ir directo
+        }
         
         if ((previaX = 0) & (previaY = 0)) {
             let previaX = posX;
@@ -67,16 +82,6 @@ class Enemigo {
         return;
     }
 
-    method int obtenerSentido(int posicionEnemigo, int posicionTarget) {
-        if (posicionEnemigo > posicionTarget) { return -1; }
-        if (posicionEnemigo < posicionTarget) { return 1; }
-        return 0;
-    }
-
-    method int verificarPared(int fila, int col, Mapa mapa) {
-        return mapa.esPared(fila, col);
-    }
-
     method int esMovimientoSeguro(int fila, int col, Mapa mapa) {
         if (mapa.esPared(fila, col) = 1) { return 1; }
         if ((col = ultimoX) & (fila = ultimoY)) { return 1; }
@@ -91,91 +96,88 @@ class Enemigo {
         return;
     }
 
+    method int calcularDistancia(int x1, int y1, int x2, int y2) {
+        var int dx, dy;
+        let dx = x1 - x2;
+        if (dx < 0) { let dx = 0 - dx; }
+        let dy = y1 - y2;
+        if (dy < 0) { let dy = 0 - dy; }
+        return dx + dy;
+    }
+
     method void moverHaciaJugador(Jugador jugador, Mapa mapa) {
-        var int distX, distY;
-        var int sentidoX, sentidoY;
-
+        var int mejorX, mejorY;
+        var int minDist;
+        var int distActual;
+        var boolean movio;
+        var int nextX, nextY;
+        
         do actualizarTarget(jugador);
+        
+        let mejorX = posEnemigoX;
+        let mejorY = posEnemigoY;
+        let minDist = 32000; 
+        let movio = false;
 
-        if (estado = 1) {
-            let distX = targetX - posEnemigoX;
-            if (distX < 0) { let distX = 0 - distX; }
-            let distY = targetY - posEnemigoY;
-            if (distY < 0) { let distY = 0 - distY; }
-
-            if (distX > distY) {
-                let sentidoX = obtenerSentido(posEnemigoX, targetX);
-                if (esMovimientoSeguro(posEnemigoY, posEnemigoX + sentidoX, mapa) = 0) {
-                    do darPaso(posEnemigoX + sentidoX, posEnemigoY);
-                } else {
-                    let estado = 0;
-                    let ejeBloqueado = 1;
-                    let sentidoBloqueado = sentidoX;
-                    let direccionEvasion = obtenerSentido(posEnemigoY, targetY);
-                    if (direccionEvasion = 0) { let direccionEvasion = 1; }
-                }
-            } else {
-                let sentidoY = obtenerSentido(posEnemigoY, targetY);
-                if (esMovimientoSeguro(posEnemigoY + sentidoY, posEnemigoX, mapa) = 0) {
-                    do darPaso(posEnemigoX, posEnemigoY + sentidoY);
-                } else {
-                    let estado = 0;
-                    let ejeBloqueado = 0;
-                    let sentidoBloqueado = sentidoY;
-                    let direccionEvasion = obtenerSentido(posEnemigoX, targetX);
-                    if (direccionEvasion = 0) { let direccionEvasion = 1; }
-                }
+        // Intentar Derecha
+        let nextX = posEnemigoX + 1;
+        let nextY = posEnemigoY;
+        if (esMovimientoSeguro(nextY, nextX, mapa) = 0) {
+            let distActual = calcularDistancia(nextX, nextY, targetX, targetY);
+            if (distActual < minDist) {
+                let minDist = distActual;
+                let mejorX = nextX;
+                let mejorY = nextY;
+                let movio = true;
             }
+        }
+        
+        // Intentar Izquierda
+        let nextX = posEnemigoX - 1;
+        let nextY = posEnemigoY;
+        if (esMovimientoSeguro(nextY, nextX, mapa) = 0) {
+            let distActual = calcularDistancia(nextX, nextY, targetX, targetY);
+            if (distActual < minDist) {
+                let minDist = distActual;
+                let mejorX = nextX;
+                let mejorY = nextY;
+                let movio = true;
+            }
+        }
+
+        // Intentar Abajo
+        let nextX = posEnemigoX;
+        let nextY = posEnemigoY + 1;
+        if (esMovimientoSeguro(nextY, nextX, mapa) = 0) {
+            let distActual = calcularDistancia(nextX, nextY, targetX, targetY);
+            if (distActual < minDist) {
+                let minDist = distActual;
+                let mejorX = nextX;
+                let mejorY = nextY;
+                let movio = true;
+            }
+        }
+
+        // Intentar Arriba
+        let nextX = posEnemigoX;
+        let nextY = posEnemigoY - 1;
+        if (esMovimientoSeguro(nextY, nextX, mapa) = 0) {
+            let distActual = calcularDistancia(nextX, nextY, targetX, targetY);
+            if (distActual < minDist) {
+                let minDist = distActual;
+                let mejorX = nextX;
+                let mejorY = nextY;
+                let movio = true;
+            }
+        }
+
+        if (~movio) {
+            // Si llega a un callejon sin salida, borramos la memoria del ultimo paso
+            // para permitirle dar la vuelta en el proximo turno.
+            let ultimoX = 0;
+            let ultimoY = 0;
         } else {
-            if (estado = 0) {
-                if (ejeBloqueado = 1) {
-                    if (esMovimientoSeguro(posEnemigoY, posEnemigoX + sentidoBloqueado, mapa) = 0) {
-                        do darPaso(posEnemigoX + sentidoBloqueado, posEnemigoY);
-                        let estado = 1;
-                    } else {
-                        if (esMovimientoSeguro(posEnemigoY + direccionEvasion, posEnemigoX, mapa) = 0) {
-                            do darPaso(posEnemigoX, posEnemigoY + direccionEvasion);
-                        } else {
-                            let direccionEvasion = 0 - direccionEvasion;
-                            if (esMovimientoSeguro(posEnemigoY + direccionEvasion, posEnemigoX, mapa) = 0) {
-                                do darPaso(posEnemigoX, posEnemigoY + direccionEvasion);
-                            } else {
-                                if (verificarPared(posEnemigoY, posEnemigoX - sentidoBloqueado, mapa) = 0) {
-                                    do darPaso(posEnemigoX - sentidoBloqueado, posEnemigoY);
-                                    let sentidoBloqueado = 0 - sentidoBloqueado;
-                                } else {
-                                    let ultimoX = 0;
-                                    let ultimoY = 0;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    if (ejeBloqueado = 0) {
-                        if (esMovimientoSeguro(posEnemigoY + sentidoBloqueado, posEnemigoX, mapa) = 0) {
-                            do darPaso(posEnemigoX, posEnemigoY + sentidoBloqueado);
-                            let estado = 1;
-                        } else {
-                            if (esMovimientoSeguro(posEnemigoY, posEnemigoX + direccionEvasion, mapa) = 0) {
-                                do darPaso(posEnemigoX + direccionEvasion, posEnemigoY);
-                            } else {
-                                let direccionEvasion = 0 - direccionEvasion;
-                                if (esMovimientoSeguro(posEnemigoY, posEnemigoX + direccionEvasion, mapa) = 0) {
-                                    do darPaso(posEnemigoX + direccionEvasion, posEnemigoY);
-                                } else {
-                                    if (verificarPared(posEnemigoY - sentidoBloqueado, posEnemigoX, mapa) = 0) {
-                                        do darPaso(posEnemigoX, posEnemigoY - sentidoBloqueado);
-                                        let sentidoBloqueado = 0 - sentidoBloqueado;
-                                    } else {
-                                        let ultimoX = 0;
-                                        let ultimoY = 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            do darPaso(mejorX, mejorY);
         }
         return;
     }
