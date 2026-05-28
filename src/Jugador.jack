@@ -1,3 +1,10 @@
+/**
+ * Clase Jugador
+  Encargada de rperesentar la logica de movimiento del jugador y
+   dibujar las diferentes formas que puede tomar
+ * 
+ */
+
 class Jugador {
 //ATRIBUTOS
     field int posX, posY;
