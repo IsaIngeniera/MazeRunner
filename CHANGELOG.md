@@ -4,7 +4,7 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 ## [1.0.0] - 2026-05-09
 ### Agregado
 - Inicialización del repositorio, junto con su estructura y archivos base.
-- Creación de la clase 'Mapa.jack', ´Main.jack´,´Teclado.jack´,´Juego.jack´,´Jugador.jack´,´Enemigo.jack´ y ´Validador.jack´
+- Creación de la clase `Mapa.jack`, `Main.jack`, `Teclado.jack`, `Juego.jack`, `Jugador.jack`, `Enemigo.jack` y `Validador.jack`.
 
 ## [1.0.1] - 2026-05-10
 ### Modificado
@@ -12,13 +12,13 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 
 ## [1.0.2] - 2026-05-11
 ### Agregado
-- README.md con la descripción del proyecto y los objetivos.
-- LICENSE.md con la licencia del proyecto.
-- CHANGELOG.md con el historial de cambios.
+- `LICENSE.md` con la licencia del proyecto.
+- `CONTRIBUTORS.md` con los contribuidores del proyecto.
+- `CHANGELOG.md` con el historial de cambios.
 
 ### Modificado
-- ´Main.jack´: Se agregó la lógica para la prueba de la clase ´Mapa´.
-- ´Mapa.jack´: Implementación de un laberinto básico para la prueba de la lógica del juego.
+- `Main.jack`: Se agregó la lógica para la prueba de la clase `Mapa.jack`.
+- `Mapa.jack`: Implementación de un laberinto básico para la prueba de la lógica del juego.
 
 ## [1.0.3] - 2026-05-13
 ### Modificado
@@ -40,8 +40,7 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
 - `Enemigo.jack`: Cambio de la lógica de movimiento, nuevo método de paso seguro, dibujo con varias formas y tamaño, y aparición aleatoria válida sobre el mapa.
 - `Mapa.jack`: ajustes en el diseño del laberinto y en la definición de muros internos.
 
-
-## [1.0.6] - 2026-05-24
+## [1.1.0] - 2026-05-24
 ### Agregado
 - `Teclado.jack`: Nueva clase utilitaria que abstrae la lectura de inputs del usuario (direcciones, opciones, confirmaciones) y la generación de la semilla aleatoria según el tiempo de respuesta.
 - `Validador.jack`: Nueva clase encargada de verificar la lógica de estado del juego (límites de partidas por memoria, colisiones y detección de victoria).
@@ -54,28 +53,9 @@ Todas las mejoras y modificaciones notables de este proyecto serán documentadas
   - Algoritmo de Rutas (Greedy BFS): Reescritura del algoritmo de persecución usando Distancia Manhattan, resolviendo los errores donde el enemigo quedaba atascado en pasillos y paredes con forma de U.
 - `Juego.jack`: Se ajustó el *tick rate* haciéndolo significativamente más desafiante y rápido en todos los modos.
 
-## [1.0.7] - 2026-06-
+## [1.1.1] - 2026-05-28
+### Agregado
+- `README.md`: Se añadio la descripción del proyecto y las instrucciones de ejecución.
 
-
-
-## [1.0.8] - 2026-06-
-
-
-
-## [1.0.9] - 2026-06-
-
-
-
-## [1.1.0] - 2026-05-
-
-
-
-## [1.1.1] - 2026-05-
-
-
-
-## [1.1.2] - 2026-05-
-
-
-
-## [1.1.3] - 2026-05-
+### Modificado
+- `CONTRIBUTORS.md`: Se calificaron entre los contribuidores del proyecto.
