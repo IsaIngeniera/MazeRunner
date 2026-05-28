@@ -1,3 +1,9 @@
+/**
+ * Clase Random
+  Encargada de generar números aleatorios para la lógica del juego  .
+ * 
+ */
+
 class Random {
     static int semilla; // El valor se comparte en todo el juego
 
@@ -14,12 +20,14 @@ class Random {
         // Fórmula matemática clásica para desordenar bits (Linear Congruential Generator)
         let semilla = (semilla * 7919) + 13751;
         
-        // Aseguramos que el número no se vuelva negativo por desborde
+        // Aseguramos que el número no se vuelva negativo por desborde (rango de -32768 a 32767)
+        // si pasa ese rango se vuelve negativo
         if (semilla < 0) {
             let semilla = 0 - semilla;
         }
         
         // Operación de residuo (módulo) manual para ajustar el número al rango máximo
+        // si el numero es mayor al maximo, se realiza la operacion de residuo para que quede dentro del rango
         let resultado = semilla - ((semilla / max) * max);
         return resultado;
     }

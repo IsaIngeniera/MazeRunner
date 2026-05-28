@@ -1,4 +1,13 @@
+/**
+ * Clase Enemigo
+  Encargada de rperesentar la logica de movimiento de los enemigos, la opcion de apariencia, 
+  y la logica de aparicion random en el mapa.
+ * 
+ */
+
+
 class Enemigo {
+ ///ATRIBUTOS DEL ENEMIGO
     field int posEnemigoX;
     field int posEnemigoY;
     field int velocidad;
@@ -11,7 +20,7 @@ class Enemigo {
     field int ultimoX, ultimoY;
     field int forma;
     field int tamano;
-
+  // CONSTRUCTOR: recibe posX, posY, velocidad, forma y tamaño
     constructor Enemigo new(int posX, int posY, int vel, int f, int t) {
         let posEnemigoX = posX;
         let posEnemigoY = posY;
@@ -28,10 +37,11 @@ class Enemigo {
         let tamano = t;
         return this;
     }
-
+  // metodos get para obtener pos del enemigo
     method int getPosX() { return posEnemigoX; }
     method int getPosY() { return posEnemigoY; }
-
+  // metodo super importante: da la direccion que el enemigo debe seguir para acercarse al jugadosr
+  // si la distancia es grande, realiza la logica de emboscada, sino lo persigue directamtne
     method void actualizarTarget(Jugador jugador) {
         var int posX, posY;
         var int dX, dY;
@@ -44,9 +54,9 @@ class Enemigo {
         
         // Calcular distancia al jugador
         let distAEnemigoX = posX - posEnemigoX;
-        if (distAEnemigoX < 0) { let distAEnemigoX = 0 - distAEnemigoX; }
+        if (distAEnemigoX < 0) { let distAEnemigoX = 0 - distAEnemigoX; } // verificamos si el num es negativo, si lo es hacemos valor absoluto 
         let distAEnemigoY = posY - posEnemigoY;
-        if (distAEnemigoY < 0) { let distAEnemigoY = 0 - distAEnemigoY; }
+        if (distAEnemigoY < 0) { let distAEnemigoY = 0 - distAEnemigoY; } 
         let distTotal = distAEnemigoX + distAEnemigoY;
 
         // IA AUDAZ: Si el jugador esta lejos, intenta predecir su movimiento e interceptarlo (emboscada).
@@ -57,37 +67,44 @@ class Enemigo {
             let factorPrediccion = 0; // Ir directo
         }
         
-        if ((previaX = 0) & (previaY = 0)) {
+        if ((previaX = 0) & (previaY = 0)) { // si apenas empezamos el juego la pos previa del jugador es la misma que se pos actual
             let previaX = posX;
             let previaY = posY; 
         }
+        // aqui calculamos la direccion del mov del jugador comprandao su pos actual con la previa
         let dX = posX - previaX;
         let dY = posY - previaY; 
-        
+        // Con esa dir vemos si es negativa o positiva para decidir el movimiento del jugador: 
+        //en X, positivo es derecha y negativo es izquierda ; en Y, positivo es abajo y negativo es arriba
+        // ojo! si no se mueve en ese eje, dir es 0 y no se predice mov en ese eje 
         if (dX > 0) { let dirX = 1; }
         else { if (dX < 0) { let dirX = -1; } else { let dirX = 0; } }
-        let targetX = posX + (dirX * factorPrediccion);
+        let targetX = posX + (dirX * factorPrediccion); // se calcula el target 
 
         if (dY > 0) { let dirY = 1; }
         else { if (dY < 0) { let dirY = -1; } else { let dirY = 0; } }
         let targetY = posY + (dirY * factorPrediccion);
-        
+        // aqui tenemos que si o si verificar si el target no supera los limites del mapa, para que el target no quede afuera
+        // tenemos que verificar ambos ejes y poner un valor minimo y maximo para cada uno mapa = 30 columnas x 14 filas
         if (targetX < 1)  { let targetX = 1; }
         if (targetX > 30) { let targetX = 30; }
         if (targetY < 1)  { let targetY = 1; }
         if (targetY > 14) { let targetY = 14; }
-
+       // actualizamos la pos del jugador para que la actual sea la previa en el prox turno
         let previaX = posX;
         let previaY = posY;
         return;
     }
-
+      // 1 = mov no seguro, 0 = mov seguro
     method int esMovimientoSeguro(int fila, int col, Mapa mapa) {
-        if (mapa.esPared(fila, col) = 1) { return 1; }
-        if ((col = ultimoX) & (fila = ultimoY)) { return 1; }
+        if (mapa.esPared(fila, col) = 1) { return 1; } // verifcar que no este en una pared
+        if ((col = ultimoX) & (fila = ultimoY)) { return 1; } // super important= evita las oscilaciones del enemigo entre dos celdas
+        // como? 
+        // diciendo que la poscion anteior del enmigo no es segura, porque en caso de que el enemigo considere esa celda como la que esta en menor dist
+        // al jugador el enemigo no se mueva a esa pq ya estaba antes
         return 0;
     }
-
+     // permite actualizar la pos del enemigo
     method void darPaso(int nuevoX, int nuevoY) {
         let ultimoX = posEnemigoX;
         let ultimoY = posEnemigoY;
@@ -95,7 +112,7 @@ class Enemigo {
         let posEnemigoY = nuevoY;
         return;
     }
-
+  // calcula la distancia Manhattan entre dos puntos, usada para evaluar que mov acerca mas al enemigo al jugador
     method int calcularDistancia(int x1, int y1, int x2, int y2) {
         var int dx, dy;
         let dx = x1 - x2;
@@ -104,7 +121,10 @@ class Enemigo {
         if (dy < 0) { let dy = 0 - dy; }
         return dx + dy;
     }
-
+  // metodo que REALIZA LA ACCION de moverse hacia el juegdor, ya teniendo los detllaes del target
+  // lo que hace es que tiene una distancia minima predeterminada alta, y va probando cada mov posible
+  // y ve cual de estos tiene la menor distancia al target y si es seguro  (se verifica con el metodo esMovimientoSeguro)
+  //si es asi, se mueve a esa casilla, sino se queda en la misma pos
     method void moverHaciaJugador(Jugador jugador, Mapa mapa) {
         var int mejorX, mejorY;
         var int minDist;
@@ -173,7 +193,8 @@ class Enemigo {
 
         if (~movio) {
             // Si llega a un callejon sin salida, borramos la memoria del ultimo paso
-            // para permitirle dar la vuelta en el proximo turno.
+            // para permitirle dar la vuelta en el proximo turno. pues tenemos la regla del metodo esMovimientoSeguro
+            // y la unica manera de cambiarlo es sobreescribiendo su pos para que no sea la misma que la pos previa del enemigo
             let ultimoX = 0;
             let ultimoY = 0;
         } else {
