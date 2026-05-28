@@ -41,7 +41,7 @@ Dado que está programado en Jack, puedes jugarlo en el entorno virtual de Nand2
 
 ## Equipo y Contribuidores
 El proyecto ha sido desarrollado de forma colaborativa. 
-Para ver detalles de los aportes de cada desarrollador (Isabella Ocampo Sanchez, Maria Laura Tafur Gomez, y Juan Manuel Hernandez Martelo), consulta el archivo [CONTRIBUITORS.md](./CONTRIBUITORS.md).
+Para ver detalles de los aportes de cada desarrollador (Isabella Ocampo Sanchez, Maria Laura Tafur Gomez, y Juan Manuel Hernandez Martelo), consulta el archivo [CONTRIBUTORS.md](./CONTRIBUTORS.md).
 
 ## Licencia y Cambios
 *   Este proyecto está protegido bajo la licencia descrita en [LICENSE.md](./LICENSE.md).
