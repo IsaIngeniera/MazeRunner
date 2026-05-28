@@ -11,5 +11,5 @@
 | Nombre | Rol | Autoevaluación | Coevaluación |
 | :--- | :--- | :--- | :--- |
 | **Isabella Ocampo Sanchez** | Lider/Doc/Dev | | - Considero que supo distribuir los cargos y manejar la estructura del proyecto, una buena imagen de lo que es ser lider. |
-| **Maria Laura Tafur Gomez** | Doc/Dev | | - Considero que Laura hizo un buen trabajo con todo lo que tiene que ver con el desarrollo del enemigo y sus funcionalidades. |
-| **Juan Manuel Hernandez Martelo** | Doc/Dev | Considero que hice un buen trabajo, documentando y arreglando pequeñas cositas para el funcionamiento del mapa y demmas clases. | |
+| **Maria Laura Tafur Gomez** | Doc/Dev | Considero que realize una buena implementacion del codigo y su documentacion  | - Considero que Laura hizo un buen trabajo con todo lo que tiene que ver con el desarrollo del enemigo y sus funcionalidades. |
+| **Juan Manuel Hernandez Martelo** | Doc/Dev | Considero que hice un buen trabajo, documentando y arreglando pequeñas cositas para el funcionamiento del mapa y demmas clases. | Considero que realizo un buen trabajo con la logica del mapa y tuvo buenas practicas de codigo |
