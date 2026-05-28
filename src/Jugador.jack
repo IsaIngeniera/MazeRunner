@@ -1,8 +1,9 @@
 class Jugador {
+//ATRIBUTOS
     field int posX, posY;
     field int forma;
     field int tamano;
-
+// CONSTRUCTOR, recibe la posicion del eje y, x, la forma y el tamaño
     constructor Jugador new(int x, int y, int f, int t) {
         let posX = x;
         let posY = y;
@@ -10,27 +11,32 @@ class Jugador {
         let tamano = t;
         return this;
     }
-
+ // metodos get que retornan la posicion del jugador
     method int obtenerPosX() { return posX; }
     method int obtenerPosY() { return posY; }
-
+// metodo que permite que el jugador se mueva, recibe la direccion y una variable tipo mapa
     method void mover(int direccion, Mapa mapa) {
         var int nx, ny;
         let nx = posX;
         let ny = posY;
-
+    // aqui decidimos en que direccion va a dirigirse el player
+// si la dir es 1, se mueve hacia arriba
+// si la dir es 2, se mueve hacia abajo
+// si la dir es 3 se mueve hacia la izq
+// si la dir es 4, se mueve a la derecha
         if (direccion = 1) { let ny = posY - 1; }
         if (direccion = 2) { let ny = posY + 1; }
         if (direccion = 3) { let nx = posX - 1; }
         if (direccion = 4) { let nx = posX + 1; }
-
+// verificamos si la posicion a la cual se dirige el player colisiona con una pared
+// por eso usamos la var mapa
         if (mapa.esPared(ny, nx) = 0) {
             let posX = nx;
             let posY = ny;
         }
         return;
     }
-
+// metodo que permite dibujar las diferentes formas que puede tener el player
     method void dibujar() {
         var int baseX, baseY;
         let baseX = posX * 32;
@@ -88,7 +94,7 @@ class Jugador {
 
         return;
     }
-
+  // cada vez que se mueve el jugador, debemos borrar la posicion anterior que fue dibujada
     method void borrar() {
         var int baseX, baseY;
         let baseX = posX * 32;
@@ -97,7 +103,7 @@ class Jugador {
         do Screen.drawRectangle(baseX + 2, baseY + 2, baseX + 30, baseY + 30);
         return;
     }    
-
+// metodo que proporciona liberacion de memoria del objeto jugador
     method void dispose() {
         do Memory.deAlloc(this);
         return;
