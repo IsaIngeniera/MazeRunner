@@ -1,20 +1,26 @@
 /**
  * Clase Juego
- * Encargada de orquestar toda la logica de las partidas y las pantallas del juego.
+ * Encargada de orquestar toda la lógica de las partidas y las pantallas del juego.
+ * Actúa como el "Game Manager" (Director de Juego).
  */
 class Juego {
-    field int partidasJugadas;
-    field int modoJuego;
-    field int velocidadEnemigo;
-    field int formaJugador;
-    field int formaEnemigo;
-    field int tamano;
+    field int partidasJugadas;  // Contador de partidas para forzar limpieza de memoria
+    field int modoJuego;        // Almacena el modo seleccionado en el menú (1 a 5)
+    field int velocidadEnemigo; // Define qué tan rápido actúa el enemigo en el Game Loop
+    field int formaJugador;     // Diseño visual del jugador
+    field int formaEnemigo;     // Diseño visual del enemigo
+    field int tamano;           // Define el tamaño de los sprites de jugador/enemigo
 
+    /** Constructor de la clase Juego. Inicializa el contador de partidas en 0. */
     constructor Juego new() {
         let partidasJugadas = 0;
         return this;
     }
 
+    /**
+     * Método principal que corre toda la lógica del juego.
+     * Contiene el bucle principal ("Game Loop") y las llamadas a las distintas interfaces.
+     */
     method void ejecutar() {
         var boolean jugarDeNuevo;
         var int semilla;
@@ -25,44 +31,53 @@ class Juego {
         var boolean jugadorGano;
         var char teclaJuego;
         var int direccion;
-        var int contadorEnemigo;
+        var int contadorEnemigo; // Actúa como el timer para la velocidad del enemigo
 
         let jugarDeNuevo = true;
         
         while (jugarDeNuevo) {
             
-            // ========== VERIFICAR LIMITE DE PARTIDAS ==========
+            // ========== VERIFICAR LÍMITE DE PARTIDAS ==========
+            // Protección contra fragmentación de memoria Heap de la máquina virtual (Max 2 partidas seguidas)
             if (Validador.limitePartidas(partidasJugadas)) {
                 do pantallaLimitePartidas();
                 return;
             }
             
             // ========== INTERFAZ DE INICIO ==========
+            // Muestra el menú interactivo para que el usuario escoja las opciones
             do pantallaInicio();
             
-            // Opcion 5: Salir
+            // Opción 5: Salir del programa por completo
             if (modoJuego = 5) {
                 do pantallaDespedida();
                 return;
             }
             
             // ========== PANTALLA PRESIONA ENTER ==========
+            // Detiene la ejecución esperando un ENTER. El tiempo de demora genera la semilla aleatoria
             let semilla = pantallaPresionaEnter();
-            do Random.setSemilla(semilla);
+            do Random.setSemilla(semilla); // Alimenta al generador matemático de números
             
+            // Preparamos la pantalla borrándola
             do Screen.clearScreen();
             
+            // Instanciamos el laberinto
             let mapa = Mapa.new();
             
+            // Imprimimos la UI estática del tablero
             do Output.moveCursor(0, 0); 
             do Output.printString("INICIO");
             do Output.moveCursor(22, 53); 
             do Output.printString("META");
 
+            // Instanciamos al jugador siempre en la posición inicial (1, 1)
             let jugador = Jugador.new(1, 1, formaJugador, tamano);
             do jugador.dibujar();
             
+            // Instanciamos al enemigo (en coordenadas 0,0 por defecto)
             let enemigo = Enemigo.new(0, 0, 1, formaEnemigo, tamano);
+            // El enemigo calcula una coordenada aleatoria válida (que no sea pared) para aparecer
             do enemigo.aparecerRandom(mapa);
             do enemigo.dibujar();
 
@@ -71,55 +86,66 @@ class Juego {
             let jugadorGano = false;
 
             // ========== GAME LOOP ==========
+            // Este es el corazón del juego. Se ejecuta repetidamente hasta que alguien gane o pierda.
             while (~juegoTerminado) {
                 
+                // 1. Leer el input (dirección) del usuario
                 let teclaJuego = Keyboard.keyPressed();
                 let direccion = Teclado.leerDireccion(teclaJuego);
 
+                // 2. Mover jugador (Si oprimió una flecha válida)
                 if (direccion > 0) {
-                    do jugador.borrar();
-                    do jugador.mover(direccion, mapa);
-                    do jugador.dibujar();
+                    do jugador.borrar(); // Borra el jugador de la posición actual
+                    do jugador.mover(direccion, mapa); // Pide cambiar coordenadas si no hay pared
+                    do jugador.dibujar(); // Dibuja en la nueva posición
                 }
 
+                // 3. Inteligencia del Enemigo
                 let contadorEnemigo = contadorEnemigo + 1;
+                // El enemigo no se mueve en todos los ticks. Sólo cuando el contador supera su 'velocidad'
                 if (contadorEnemigo > velocidadEnemigo) {
-                    let contadorEnemigo = 0;
+                    let contadorEnemigo = 0; // Reiniciar contador
                     do enemigo.borrar();
-                    do enemigo.moverHaciaJugador(jugador, mapa);
+                    do enemigo.moverHaciaJugador(jugador, mapa); // Llama al algoritmo de persecución (Greedy BFS / IA)
                     do enemigo.dibujar();
                 }
 
+                // 4. Lógicas de estado (Reglas de colisión y victoria)
                 if (Validador.verificarColision(jugador, enemigo)) {
-                    let juegoTerminado = true;
+                    let juegoTerminado = true; // El enemigo te atrapó
                 }
 
                 if (Validador.verificarVictoria(jugador)) {
-                    let juegoTerminado = true;
-                    let jugadorGano = true;
+                    let juegoTerminado = true; 
+                    let jugadorGano = true; // Llegaste a la meta (15, 7)
                 }
 
+                // 5. Tick del reloj (Pausa de 50 milisegundos para no ir exageradamente rápido)
                 do Sys.wait(50);
             }
 
             // ========== PANTALLA DE FIN ==========
+            // Se le envía el booleano 'jugadorGano' para saber qué diseño renderizar
             do pantallaFin(jugadorGano);
 
-            // Liberar memoria
+            // IMPORTANTE: Liberar la memoria RAM asignada a los objetos de esta partida
+            // Sin esto, la máquina se quedaría sin memoria Heap inmediatamente
             do jugador.dispose();
             do enemigo.dispose();
             do mapa.dispose();
             
-            // Incrementar contador de partidas
+            // Incrementar contador de partidas para eventual limpieza dura
             let partidasJugadas = partidasJugadas + 1;
         }
         return;
     }
 
+    /** Muestra un aviso de límite de memoria y bloquea la ejecución. */
     method void pantallaLimitePartidas() {
         do Screen.clearScreen();
         do Screen.setColor(true);
         
+        // Dibujo manual de un recuadro de aviso (Doble borde)
         do Screen.drawRectangle(50, 40, 462, 48);
         do Screen.drawRectangle(50, 200, 462, 208);
         do Screen.drawRectangle(50, 40, 58, 208);
@@ -130,6 +156,7 @@ class Juego {
         do Screen.drawRectangle(60, 50, 66, 196);
         do Screen.drawRectangle(446, 50, 452, 196);
         
+        // Textos del aviso
         do Output.moveCursor(5, 12);
         do Output.printString("================================");
         do Output.moveCursor(6, 12);
@@ -154,10 +181,12 @@ class Juego {
         return;
     }
 
+    /** Menú principal del juego. Lee opciones del usuario y setea las configuraciones base. */
     method void pantallaInicio() {
         do Screen.clearScreen();
-        
         do Screen.setColor(true);
+        
+        // Bordes de la pantalla de inicio
         do Screen.drawRectangle(50, 25, 462, 30);
         do Screen.drawRectangle(50, 230, 462, 235);
         do Screen.drawRectangle(50, 25, 55, 235);
@@ -168,6 +197,7 @@ class Juego {
         do Screen.drawRectangle(60, 35, 65, 225);
         do Screen.drawRectangle(447, 35, 452, 225);
 
+        // Títulos principales
         do Output.moveCursor(3, 20);
         do Output.printString("**********************");
         do Output.moveCursor(4, 20);
@@ -188,22 +218,25 @@ class Juego {
         
         do Output.moveCursor(17, 16);
         do Output.printString("Presiona 1, 2, 3, 4 o 5 para elegir");
-
         do Output.moveCursor(20, 20);
         do Output.printString("Autores: Isa O - Lau C - Juan M");
 
+        // Valores por defecto
         let modoJuego = 0;
         let velocidadEnemigo = 5;
         let formaJugador = 0;
         let formaEnemigo = 0;
         let tamano = 1;
 
+        // Bucle bloqueante esperando que el usuario oprima una de las 5 opciones
         while (modoJuego = 0) {
             let modoJuego = Teclado.leerOpcion(Keyboard.keyPressed());
         }
         do Teclado.esperarTecla();
 
-        // Modo 1: Basico
+        // Aplicación de configuraciones según la opción
+
+        // Modo 1: Básico (Enemigo medio rápido)
         if (modoJuego = 1) {
             let formaJugador = 0;
             let formaEnemigo = 0;
@@ -211,15 +244,15 @@ class Juego {
             let tamano = 1;
         }
 
-        // Modo 2: Super Rapido
+        // Modo 2: Súper Rápido (Enemigo ataca casi cada 2 ticks, tamaño pequeño para ambos)
         if (modoJuego = 2) {
-            let velocidadEnemigo = 2;
+            let velocidadEnemigo = 2; // Menor número = enemigo se mueve más veces por segundo
             let formaJugador = 0;
             let formaEnemigo = 0;
             let tamano = 2;
         }
 
-        // Modo 3: Cambiar forma del jugador
+        // Modo 3: Sub-menú de forma del jugador
         if (modoJuego = 3) {
             let velocidadEnemigo = 3;
             
@@ -246,7 +279,7 @@ class Juego {
             do Teclado.esperarTecla();
         }
 
-        // Modo 4: Cambiar forma del enemigo
+        // Modo 4: Sub-menú de forma del enemigo
         if (modoJuego = 4) {
             let velocidadEnemigo = 3;
             
@@ -276,6 +309,7 @@ class Juego {
         return;
     }
 
+    /** Interfaz de despedida al seleccionar salir del juego (Modo 5). */
     method void pantallaDespedida() {
         do Screen.clearScreen();
         do Screen.setColor(true);
@@ -293,6 +327,10 @@ class Juego {
         return;
     }
 
+    /** 
+     * Muestra la pantalla pre-partida.
+     * Retorna la entropía (semilla) generada por el tiempo de retraso del usuario al dar enter.
+     */
     method int pantallaPresionaEnter() {
         do Screen.clearScreen();
         do Screen.setColor(true);
@@ -306,20 +344,25 @@ class Juego {
         do Output.moveCursor(10, 13);
         do Output.printString("PRESIONA ENTER PARA EMPEZAR");
         
+        // Esta función atrapa la latencia humana para generar aleatoriedad
         return Teclado.obtenerSemillaConEnter();
     }
 
+    /** Interfaz dinámica de conclusión de partida. Recibe booleano de victoria. */
     method void pantallaFin(boolean jugadorGano) {
         do Screen.clearScreen();
         
         if (jugadorGano) {
+            // ==== PANTALLA DE VICTORIA ====
             do Screen.setColor(true);
             
+            // Dibujar el trofeo/bordes
             do Screen.drawRectangle(40, 20, 472, 28);
             do Screen.drawRectangle(40, 230, 472, 238);
             do Screen.drawRectangle(40, 20, 48, 238);
             do Screen.drawRectangle(464, 20, 472, 238);
             
+            // Fuegos artificiales/Estrellas usando primitivas
             do Screen.drawCircle(80, 60, 15);
             do Screen.drawLine(80, 75, 80, 100);
             do Screen.drawCircle(100, 80, 12);
@@ -334,6 +377,7 @@ class Juego {
             do Screen.drawCircle(445, 90, 10);
             do Screen.drawLine(445, 100, 445, 120);
             
+            // Trofeo central
             do Screen.drawRectangle(240, 85, 272, 95);
             do Screen.drawRectangle(248, 95, 264, 115);
             do Screen.drawRectangle(235, 115, 277, 125);
@@ -352,25 +396,30 @@ class Juego {
             do Output.printString("Eres un verdadero campeon!");
             
         } else {
+            // ==== PANTALLA DE DERROTA (GAME OVER) ====
             do Screen.setColor(true);
             
+            // Bordes
             do Screen.drawRectangle(50, 30, 462, 38);
             do Screen.drawRectangle(50, 220, 462, 228);
             do Screen.drawRectangle(50, 30, 58, 228);
             do Screen.drawRectangle(454, 30, 462, 228);
             
-            do Screen.drawCircle(256, 100, 40);
+            // Calavera Gigante (Death Graphic)
+            do Screen.drawCircle(256, 100, 40); // Cráneo
+            // Ojos en X (muerto)
             do Screen.drawLine(235, 85, 245, 95);
             do Screen.drawLine(245, 85, 235, 95);
             do Screen.drawLine(267, 85, 277, 95);
             do Screen.drawLine(277, 85, 267, 95);
+            // Dientes/boca
             do Screen.drawLine(236, 125, 246, 115);
             do Screen.drawLine(246, 115, 266, 115);
             do Screen.drawLine(266, 115, 276, 125);
-            
             do Screen.drawCircle(235, 105, 3);
             do Screen.drawCircle(277, 105, 3);
             
+            // Tumbas o cruces a los lados
             do Screen.drawCircle(80, 60, 15);
             do Screen.drawCircle(95, 55, 12);
             do Screen.drawCircle(110, 60, 15);
@@ -399,11 +448,13 @@ class Juego {
         do Output.moveCursor(18, 18);
         do Output.printString("Presiona ENTER para Retry");
 
+        // Detener programa hasta que se decida reiniciar
         do Teclado.esperarEnter();
         
         return;
     }
 
+    /** Destructor para liberar de forma forzada esta clase en la memoria Heap */
     method void dispose() {
         do Memory.deAlloc(this);
         return;
